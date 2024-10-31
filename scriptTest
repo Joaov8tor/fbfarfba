@@ -1,6 +1,8 @@
+-- Script Hub para Roblox com funcionalidades úteis
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local Mouse = LocalPlayer:GetMouse()
+local RunService = game:GetService("RunService")
 
 -- Criar a GUI principal
 local screenGui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
@@ -8,7 +10,7 @@ local mainFrame = Instance.new("Frame", screenGui)
 mainFrame.Size = UDim2.new(0, 300, 0, 400)
 mainFrame.Position = UDim2.new(0.5, -150, 0.5, -200)
 mainFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-mainFrame.Visible = false
+mainFrame.Visible = false -- Inicia invisível
 
 -- Toggle do painel
 local toggleButton = Instance.new("TextButton", screenGui)
@@ -35,15 +37,18 @@ textbox.ClearTextOnFocus = false
 
 -- Função para adicionar ESP a um jogador
 local function addESP(player)
-    local highlight = Instance.new("Highlight", player.Character or player.CharacterAdded:Wait())
-    highlight.FillColor = Color3.fromRGB(255, 255, 0)  -- Cor amarela
-    highlight.OutlineColor = Color3.fromRGB(0, 0, 0)  -- Cor do contorno
-    highlight.Adornee = player.Character
+    if player.Character then
+        local highlight = Instance.new("Highlight", player.Character)
+        highlight.FillColor = Color3.fromRGB(255, 255, 0)  -- Cor amarela
+        highlight.OutlineColor = Color3.fromRGB(0, 0, 0)  -- Cor do contorno
+        highlight.Adornee = player.Character
 
-    -- Conectar o clique do mouse ao jogador
-    highlight.MouseClick:Connect(function()
-        textbox.Text = player.Name  -- Define o nome do jogador na TextBox
-    end)
+        -- Conectar o clique do mouse ao jogador
+        highlight.MouseClick:Connect(function()
+            textbox.Text = player.Name  -- Define o nome do jogador na TextBox
+            setclipboard(player.Name) -- Copia o nome do jogador para a área de transferência
+        end)
+    end
 end
 
 -- Conectando a adição de ESP a jogadores que entram no jogo
@@ -55,30 +60,13 @@ end)
 
 -- Adicionando ESP a jogadores já presentes
 for _, player in pairs(Players:GetPlayers()) do
-    if player.Character then
-        addESP(player)
-    end
+    addESP(player)
 end
-
--- Função para copiar o texto da TextBox
-local function copyNickname()
-    setclipboard(textbox.Text)  -- Copia o texto da TextBox para a área de transferência
-end
-
--- Adicionando um botão de copiar
-local copyButton = Instance.new("TextButton", mainFrame)
-copyButton.Size = UDim2.new(0, 100, 0, 30)
-copyButton.Position = UDim2.new(0.5, -50, 0.2, 10) -- Abaixo da TextBox
-copyButton.Text = "Copiar"
-copyButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-copyButton.TextColor3 = Color3.fromRGB(0, 0, 0)
-
-copyButton.MouseButton1Click:Connect(copyNickname)  -- Conecta a função de copiar
 
 -- Funções de ping, FPS e resolução
 local pingLabel = Instance.new("TextLabel", mainFrame)
 pingLabel.Size = UDim2.new(0, 200, 0, 50)
-pingLabel.Position = UDim2.new(0.5, -100, 0.3, 10) -- Abaixo do botão de copiar
+pingLabel.Position = UDim2.new(0.5, -100, 0.3, 10) -- Abaixo da TextBox
 pingLabel.Text = "Ping: "
 pingLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 pingLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
@@ -98,10 +86,11 @@ resolutionLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 resolutionLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
 
 -- Atualiza os valores de ping e FPS
-game:GetService("RunService").RenderStepped:Connect(function()
-    local ping = math.floor(Players:GetPlayerByUserId(LocalPlayer.UserId).Ping)  -- Obtém o ping
-    local fps = math.floor(1 / game:GetService("RunService").Heartbeat:Wait())  -- Calcula FPS
+RunService.RenderStepped:Connect(function()
+    local ping = LocalPlayer:GetNetworkPing()  -- Obtém o ping
+    local fps = math.floor(1 / RunService.Heartbeat:Wait())  -- Calcula FPS
     pingLabel.Text = "Ping: " .. ping .. " ms"
     fpsLabel.Text = "FPS: " .. fps
 end)
+
 
