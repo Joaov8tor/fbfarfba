@@ -66,10 +66,21 @@ local function toggleESP()
                 billboardGui.Size = UDim2.new(0, 100, 0, 100)
                 billboardGui.StudsOffset = Vector3.new(0, 3, 0)
 
+                -- Criar um frame para a cor do ESP
                 local frame = Instance.new("Frame")
                 frame.BackgroundColor3 = Color3.new(1, 1, 0) -- Cor amarela
                 frame.Size = UDim2.new(1, 0, 1, 0)
                 frame.Parent = billboardGui
+
+                -- Criar um TextLabel para o nickname
+                local nameLabel = Instance.new("TextLabel")
+                nameLabel.Size = UDim2.new(1, 0, 0, 20)
+                nameLabel.Position = UDim2.new(0, 0, 0, -25)  -- A posição acima do ESP
+                nameLabel.BackgroundTransparency = 1
+                nameLabel.Text = player.Name
+                nameLabel.TextColor3 = Color3.new(1, 1, 1) -- Texto branco
+                nameLabel.TextSize = 14
+                nameLabel.Parent = billboardGui
 
                 billboardGui.Parent = workspace
             else
