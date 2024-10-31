@@ -63,8 +63,9 @@ local function toggleESP()
                 -- Criar um BillboardGui para o ESP
                 local billboardGui = Instance.new("BillboardGui")
                 billboardGui.Adornee = player.Character:WaitForChild("HumanoidRootPart")
-                billboardGui.Size = UDim2.new(0, 100, 0, 100)
-                billboardGui.StudsOffset = Vector3.new(0, 3, 0)
+                billboardGui.Size = UDim2.new(0, 200, 0, 50)
+                billboardGui.StudsOffset = Vector3.new(0, 3, 0) -- Distância acima do jogador
+                billboardGui.AlwaysOnTop = true
 
                 -- Criar um frame para a cor do ESP
                 local frame = Instance.new("Frame")
@@ -82,11 +83,12 @@ local function toggleESP()
                 nameLabel.TextSize = 14
                 nameLabel.Parent = billboardGui
 
-                billboardGui.Parent = workspace
+                -- Adiciona o BillboardGui ao Workspace
+                billboardGui.Parent = player.Character:WaitForChild("HumanoidRootPart")
             else
                 -- Remover o ESP
-                for _, v in pairs(workspace:GetChildren()) do
-                    if v:IsA("BillboardGui") and v.Adornee and v.Adornee:IsDescendantOf(player.Character) then
+                for _, v in pairs(player.Character:GetChildren()) do
+                    if v:IsA("BillboardGui") then
                         v:Destroy()
                     end
                 end
@@ -129,6 +131,7 @@ Frame.InputChanged:Connect(function(input)
         Frame.Position = UDim2.new(startPos.X.Offset + delta.X, 0, startPos.Y.Offset + delta.Y, 0)
     end
 end)
+
 
 
 
