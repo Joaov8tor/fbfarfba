@@ -1,129 +1,107 @@
--- Criação da interface gráfica
-local ScreenGui = Instance.new("ScreenGui")
-local Panel = Instance.new("Frame")
-local ToggleButton = Instance.new("TextButton")
-local OpenPanelButton = Instance.new("TextButton")
-local ESPButton = Instance.new("TextButton")
-local JumpButton = Instance.new("TextButton")
-local PingLabel = Instance.new("TextLabel")
-local FPSLabel = Instance.new("TextLabel")
-local ResolutionLabel = Instance.new("TextLabel")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Mouse = LocalPlayer:GetMouse()
 
--- Configuração do painel
-ScreenGui.Parent = game.CoreGui
-Panel.Size = UDim2.new(0, 300, 0, 400)
-Panel.Position = UDim2.new(0.5, -150, 0.5, -200)
-Panel.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-Panel.Visible = true
-Panel.Parent = ScreenGui
+-- Criar a GUI principal
+local screenGui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
+local mainFrame = Instance.new("Frame", screenGui)
+mainFrame.Size = UDim2.new(0, 300, 0, 400)
+mainFrame.Position = UDim2.new(0.5, -150, 0.5, -200)
+mainFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+mainFrame.Visible = false
 
--- Configuração do botão de toggle do painel
-ToggleButton.Size = UDim2.new(0, 100, 0, 50)
-ToggleButton.Position = UDim2.new(0, 10, 0, 10)
-ToggleButton.Text = "Toggle Painel"
-ToggleButton.Parent = Panel
+-- Toggle do painel
+local toggleButton = Instance.new("TextButton", screenGui)
+toggleButton.Size = UDim2.new(0, 100, 0, 50)
+toggleButton.Position = UDim2.new(0.5, -50, 0, 0)
+toggleButton.Text = "Abrir Painel"
+toggleButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+toggleButton.TextColor3 = Color3.fromRGB(0, 0, 0)
 
--- Configuração do botão abrir painel
-OpenPanelButton.Size = UDim2.new(0, 100, 0, 50)
-OpenPanelButton.Position = UDim2.new(0, 10, 0, 70)
-OpenPanelButton.Text = "Abrir Painel"
-OpenPanelButton.Visible = false
-OpenPanelButton.Parent = Panel
+local function togglePanel()
+    mainFrame.Visible = not mainFrame.Visible
+end
 
--- Configuração do botão ESP
-ESPButton.Size = UDim2.new(0, 100, 0, 50)
-ESPButton.Position = UDim2.new(0, 10, 0, 130)
-ESPButton.Text = "ESP"
-ESPButton.Parent = Panel
+toggleButton.MouseButton1Click:Connect(togglePanel)
 
--- Configuração do botão Power Jump
-JumpButton.Size = UDim2.new(0, 100, 0, 50)
-JumpButton.Position = UDim2.new(0, 10, 0, 190)
-JumpButton.Text = "Power Jump"
-JumpButton.Parent = Panel
+-- Criar a TextBox para mostrar o nickname
+local textbox = Instance.new("TextBox", mainFrame)
+textbox.Size = UDim2.new(0, 200, 0, 50)
+textbox.Position = UDim2.new(0.5, -100, 0.1, 10) -- Centralizado na parte superior
+textbox.Text = "Nickname"
+textbox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+textbox.TextColor3 = Color3.fromRGB(0, 0, 0)
+textbox.ClearTextOnFocus = false
 
--- Configuração dos labels
-PingLabel.Size = UDim2.new(0, 250, 0, 50)
-PingLabel.Position = UDim2.new(0, 10, 0, 250)
-PingLabel.BackgroundTransparency = 1
-PingLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-PingLabel.Parent = Panel
+-- Função para adicionar ESP a um jogador
+local function addESP(player)
+    local highlight = Instance.new("Highlight", player.Character or player.CharacterAdded:Wait())
+    highlight.FillColor = Color3.fromRGB(255, 255, 0)  -- Cor amarela
+    highlight.OutlineColor = Color3.fromRGB(0, 0, 0)  -- Cor do contorno
+    highlight.Adornee = player.Character
 
-FPSLabel.Size = UDim2.new(0, 250, 0, 50)
-FPSLabel.Position = UDim2.new(0, 10, 0, 280)
-FPSLabel.BackgroundTransparency = 1
-FPSLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-FPSLabel.Parent = Panel
+    -- Conectar o clique do mouse ao jogador
+    highlight.MouseClick:Connect(function()
+        textbox.Text = player.Name  -- Define o nome do jogador na TextBox
+    end)
+end
 
-ResolutionLabel.Size = UDim2.new(0, 250, 0, 50)
-ResolutionLabel.Position = UDim2.new(0, 10, 0, 310)
-ResolutionLabel.BackgroundTransparency = 1
-ResolutionLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-ResolutionLabel.Parent = Panel
+-- Conectando a adição de ESP a jogadores que entram no jogo
+Players.PlayerAdded:Connect(function(player)
+    player.CharacterAdded:Connect(function()
+        addESP(player)
+    end)
+end)
 
--- Variável para controle do ESP
-local espEnabled = false
-
--- Função para ativar o ESP
-local function toggleESP()
-    espEnabled = not espEnabled
-    for _, player in pairs(game.Players:GetPlayers()) do
-        if player ~= game.Players.LocalPlayer then
-            if espEnabled then
-                local highlight = Instance.new("Highlight", player)
-                highlight.FillColor = Color3.fromRGB(255, 255, 0)  -- Cor amarela
-                highlight.OutlineColor = Color3.fromRGB(0, 0, 0)  -- Cor do contorno
-                highlight.OutlineTransparency = 0.5
-                highlight.Adornee = player.Character or player.CharacterAdded:Wait()
-            else
-                for _, child in pairs(player:GetChildren()) do
-                    if child:IsA("Highlight") then
-                        child:Destroy()
-                    end
-                end
-            end
-        end
+-- Adicionando ESP a jogadores já presentes
+for _, player in pairs(Players:GetPlayers()) do
+    if player.Character then
+        addESP(player)
     end
 end
 
--- Função para atualizar Ping, FPS e Resolução
-local function updateStats()
-    while true do
-        PingLabel.Text = "Ping: " .. game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValueString()
-        FPSLabel.Text = "FPS: " .. math.floor(1 / game:GetService("RunService").RenderStepped:Wait())
-        ResolutionLabel.Text = "Resolução: " .. game.Workspace.CurrentCamera.ViewportSize.X .. "x" .. game.Workspace.CurrentCamera.ViewportSize.Y
-        wait(1)  -- Atualiza a cada segundo
-    end
+-- Função para copiar o texto da TextBox
+local function copyNickname()
+    setclipboard(textbox.Text)  -- Copia o texto da TextBox para a área de transferência
 end
 
--- Função para ativar o Power Jump
-local function activateJump()
-    local jumpHeight = 50  -- Altere este valor conforme necessário
-    game.Players.LocalPlayer.Character.Humanoid.JumpPower = jumpHeight
-end
+-- Adicionando um botão de copiar
+local copyButton = Instance.new("TextButton", mainFrame)
+copyButton.Size = UDim2.new(0, 100, 0, 30)
+copyButton.Position = UDim2.new(0.5, -50, 0.2, 10) -- Abaixo da TextBox
+copyButton.Text = "Copiar"
+copyButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+copyButton.TextColor3 = Color3.fromRGB(0, 0, 0)
 
--- Conectando os botões às funções
-ToggleButton.MouseButton1Click:Connect(function()
-    Panel.Visible = not Panel.Visible
-    OpenPanelButton.Visible = not Panel.Visible
+copyButton.MouseButton1Click:Connect(copyNickname)  -- Conecta a função de copiar
+
+-- Funções de ping, FPS e resolução
+local pingLabel = Instance.new("TextLabel", mainFrame)
+pingLabel.Size = UDim2.new(0, 200, 0, 50)
+pingLabel.Position = UDim2.new(0.5, -100, 0.3, 10) -- Abaixo do botão de copiar
+pingLabel.Text = "Ping: "
+pingLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+pingLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
+
+local fpsLabel = Instance.new("TextLabel", mainFrame)
+fpsLabel.Size = UDim2.new(0, 200, 0, 50)
+fpsLabel.Position = UDim2.new(0.5, -100, 0.4, 10) -- Abaixo do ping
+fpsLabel.Text = "FPS: "
+fpsLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+fpsLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
+
+local resolutionLabel = Instance.new("TextLabel", mainFrame)
+resolutionLabel.Size = UDim2.new(0, 200, 0, 50)
+resolutionLabel.Position = UDim2.new(0.5, -100, 0.5, 10) -- Abaixo do FPS
+resolutionLabel.Text = "Resolução: " .. tostring(workspace.CurrentCamera.ViewportSize)
+resolutionLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+resolutionLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
+
+-- Atualiza os valores de ping e FPS
+game:GetService("RunService").RenderStepped:Connect(function()
+    local ping = math.floor(Players:GetPlayerByUserId(LocalPlayer.UserId).Ping)  -- Obtém o ping
+    local fps = math.floor(1 / game:GetService("RunService").Heartbeat:Wait())  -- Calcula FPS
+    pingLabel.Text = "Ping: " .. ping .. " ms"
+    fpsLabel.Text = "FPS: " .. fps
 end)
-
-OpenPanelButton.MouseButton1Click:Connect(function()
-    Panel.Visible = true
-    OpenPanelButton.Visible = false
-end)
-
-ESPButton.MouseButton1Click:Connect(function()
-    toggleESP()
-    ESPButton.Text = espEnabled and "Desativar ESP" or "ESP"
-end)
-
-JumpButton.MouseButton1Click:Connect(function()
-    activateJump()
-end)
-
--- Iniciando a atualização dos status
-updateStats()
-
-
 
