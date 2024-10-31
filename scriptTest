@@ -13,8 +13,8 @@ ScreenGui.Name = "ScriptHub"
 -- Configurando o Frame principal
 Frame.Parent = ScreenGui
 Frame.BackgroundColor3 = Color3.new(1, 1, 1)
-Frame.Size = UDim2.new(0, 300, 0, 200)
-Frame.Position = UDim2.new(0.5, -150, 0.5, -100)
+Frame.Size = UDim2.new(0, 400, 0, 300)  -- Aumentando o tamanho do painel
+Frame.Position = UDim2.new(0.5, -200, 0.5, -150)
 
 -- Configurando o rótulo do Power Jump
 JumpLabel.Parent = Frame
@@ -27,7 +27,7 @@ JumpLabel.TextSize = 18
 -- Configurando a caixa de entrada para o valor do Jump
 JumpBox.Parent = Frame
 JumpBox.PlaceholderText = "50"  -- Valor padrão
-JumpBox.Size = UDim2.new(0, 100, 0, 50)
+JumpBox.Size = UDim2.new(0, 150, 0, 50)
 JumpBox.Position = UDim2.new(0, 120, 0, 20)
 JumpBox.TextColor3 = Color3.new(0, 0, 0)
 JumpBox.TextSize = 18
@@ -35,8 +35,8 @@ JumpBox.TextSize = 18
 -- Configurando o botão Aplicar
 ApplyButton.Parent = Frame
 ApplyButton.Text = "Aplicar Jump"
-ApplyButton.Size = UDim2.new(0, 200, 0, 50)
-ApplyButton.Position = UDim2.new(0, 50, 0, 80)
+ApplyButton.Size = UDim2.new(0, 350, 0, 50)
+ApplyButton.Position = UDim2.new(0, 25, 0, 80)
 ApplyButton.BackgroundColor3 = Color3.new(0.2, 0.6, 0.8)
 ApplyButton.TextColor3 = Color3.new(1, 1, 1)
 ApplyButton.TextSize = 18
@@ -44,8 +44,8 @@ ApplyButton.TextSize = 18
 -- Configurando o botão ESP
 EspButton.Parent = Frame
 EspButton.Text = "Ativar ESP"
-EspButton.Size = UDim2.new(0, 200, 0, 50)
-EspButton.Position = UDim2.new(0, 50, 0, 140)
+EspButton.Size = UDim2.new(0, 350, 0, 50)
+EspButton.Position = UDim2.new(0, 25, 0, 150)
 EspButton.BackgroundColor3 = Color3.new(0.2, 0.6, 0.8)
 EspButton.TextColor3 = Color3.new(1, 1, 1)
 EspButton.TextSize = 18
@@ -118,5 +118,6 @@ Frame.InputChanged:Connect(function(input)
         Frame.Position = UDim2.new(startPos.X.Offset + delta.X, 0, startPos.Y.Offset + delta.Y, 0)
     end
 end)
+
 
 
