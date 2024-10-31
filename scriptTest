@@ -7,7 +7,7 @@ local ApplyButton = Instance.new("TextButton")
 local EspButton = Instance.new("TextButton")
 local PanelToggleButton = Instance.new("TextButton") -- Botão para ocultar/exibir o painel
 local OpenPanelButton = Instance.new("TextButton") -- Botão para abrir o painel
-local isVisible = false -- Inicialmente o painel está oculto
+local isVisible = true -- Inicialmente o painel está visível
 
 -- Configurando o ScreenGui
 ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
@@ -117,5 +117,6 @@ end)
 
 -- Ajuste do painel inicial
 Frame.Visible = isVisible
+
 
 
