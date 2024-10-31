@@ -1,83 +1,108 @@
--- Script Principal
-local Player = game.Players.LocalPlayer
-local Mouse = Player:GetMouse()
-local UserInputService = game:GetService("UserInputService")
+local player = game.Players.LocalPlayer
+local mouse = player:GetMouse()
+local gui = Instance.new("ScreenGui")
+local frame = Instance.new("Frame")
+local espToggle = Instance.new("TextButton")
+local pingLabel = Instance.new("TextLabel")
+local fpsLabel = Instance.new("TextLabel")
+local resolutionLabel = Instance.new("TextLabel")
+local copyButton = Instance.new("TextButton")
+local espEnabled = false
+local playersESP = {}
 
--- Criar um painel
-local ScreenGui = Instance.new("ScreenGui", Player.PlayerGui)
-local Panel = Instance.new("Frame", ScreenGui)
-Panel.Size = UDim2.new(0, 300, 0, 400)
-Panel.Position = UDim2.new(0.5, -150, 0.5, -200)
-Panel.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-Panel.Visible = true
+-- Configurações da GUI
+gui.Parent = player.PlayerGui
 
--- Criar um botão de script
-local ScriptButton = Instance.new("TextButton", ScreenGui)
-ScriptButton.Size = UDim2.new(0, 100, 0, 50)
-ScriptButton.Position = UDim2.new(0.5, -50, 0, 20) -- Posição do botão fora do painel
-ScriptButton.Text = "Script"
-ScriptButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+frame.Size = UDim2.new(0, 300, 0, 400)
+frame.Position = UDim2.new(0.5, -150, 0.5, -200)
+frame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+frame.Parent = gui
 
--- Função para tornar o painel invisível ou visível
-local function togglePanel()
-    Panel.Visible = not Panel.Visible
+-- Botão de Toggle ESP
+espToggle.Size = UDim2.new(0, 280, 0, 50)
+espToggle.Position = UDim2.new(0, 10, 0, 10)
+espToggle.BackgroundColor3 = Color3.fromRGB(0, 170, 0)
+espToggle.Text = "Toggle ESP"
+espToggle.Parent = frame
+
+-- Labels para Ping, FPS e Resolução
+pingLabel.Size = UDim2.new(0, 280, 0, 50)
+pingLabel.Position = UDim2.new(0, 10, 0, 70)
+pingLabel.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+pingLabel.TextColor3 = Color3.new(1, 1, 1)
+pingLabel.Text = "Ping: " .. game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValueString()
+pingLabel.Parent = frame
+
+fpsLabel.Size = UDim2.new(0, 280, 0, 50)
+fpsLabel.Position = UDim2.new(0, 10, 0, 130)
+fpsLabel.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+fpsLabel.TextColor3 = Color3.new(1, 1, 1)
+fpsLabel.Text = "FPS: " .. math.floor(1 / game:GetService("RunService").RenderStepped:Wait())
+fpsLabel.Parent = frame
+
+resolutionLabel.Size = UDim2.new(0, 280, 0, 50)
+resolutionLabel.Position = UDim2.new(0, 10, 0, 190)
+resolutionLabel.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+resolutionLabel.TextColor3 = Color3.new(1, 1, 1)
+resolutionLabel.Text = "Resolução: " .. tostring(workspace.CurrentCamera.ViewportSize)
+resolutionLabel.Parent = frame
+
+-- Função para copiar o nickname
+copyButton.Size = UDim2.new(0, 280, 0, 50)
+copyButton.Position = UDim2.new(0, 10, 0, 250)
+copyButton.BackgroundColor3 = Color3.fromRGB(0, 170, 170)
+copyButton.Text = "Copiar Nickname"
+copyButton.Parent = frame
+copyButton.Visible = false
+
+local function toggleESP()
+	espEnabled = not espEnabled
+	for _, v in pairs(playersESP) do
+		v:Destroy()
+	end
+	playersESP = {}
+	if espEnabled then
+		for _, v in pairs(game.Players:GetPlayers()) do
+			if v ~= player then
+				local espBox = Instance.new("BoxHandleAdornment")
+				espBox.Size = Vector3.new(2, 2, 2)
+				espBox.Color3 = Color3.fromRGB(255, 255, 0)
+				espBox.Adornee = v.Character:WaitForChild("HumanoidRootPart")
+				espBox.AlwaysOnTop = true
+				espBox.Parent = v.Character.HumanoidRootPart
+				playersESP[v] = espBox
+			end
+		end
+	end
 end
 
--- Conexão do botão de script
-ScriptButton.MouseButton1Click:Connect(function()
-    togglePanel()
+espToggle.MouseButton1Click:Connect(function()
+	toggleESP()
 end)
 
--- Função para arrastar o painel
-local dragging = false
-local dragInput, startPos, startSize
-
-ScriptButton.MouseButton1Down:Connect(function()
-    dragging = true
-    startPos = Mouse.Position
+mouse.Button1Down:Connect(function()
+	local target = mouse.Target
+	if target and target.Parent:FindFirstChild("Humanoid") then
+		local targetPlayer = game.Players:GetPlayerFromCharacter(target.Parent)
+		if targetPlayer then
+			copyButton.Visible = true
+			copyButton.Text = "Copiar: " .. targetPlayer.Name
+			copyButton.MouseButton1Click:Connect(function()
+				setclipboard(targetPlayer.Name)
+				copyButton.Text = "Copiado!"
+				wait(2)
+				copyButton.Text = "Copiar Nickname"
+				copyButton.Visible = false
+			end)
+		end
+	end
 end)
 
-Mouse.Move:Connect(function()
-    if dragging then
-        local delta = Mouse.Position - startPos
-        Panel.Position = Panel.Position + UDim2.new(0, delta.X, 0, delta.Y)
-        startPos = Mouse.Position
-    end
-end)
-
-UserInputService.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = false
-    end
-end)
-
--- Criar mais botões no painel
-local function createButton(text, position, callback)
-    local button = Instance.new("TextButton", Panel)
-    button.Size = UDim2.new(0, 280, 0, 40)
-    button.Position = position
-    button.Text = text
-    button.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
-
-    button.MouseButton1Click:Connect(callback)
+-- Atualiza o ping e FPS a cada segundo
+while true do
+	wait(1)
+	pingLabel.Text = "Ping: " .. game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValueString()
+	fpsLabel.Text = "FPS: " .. math.floor(1 / game:GetService("RunService").RenderStepped:Wait())
+	resolutionLabel.Text = "Resolução: " .. tostring(workspace.CurrentCamera.ViewportSize)
 end
 
--- Adicionar funcionalidades dos botões
-createButton("ESP Players", UDim2.new(0, 10, 0, 60), function()
-    print("ESP Players Activated")
-    -- Aqui você pode adicionar a lógica para ESP
-end)
-
-createButton("Ping", UDim2.new(0, 10, 0, 110), function()
-    print("Ping: " .. game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValue()) -- Exibir o ping
-end)
-
-createButton("FPS", UDim2.new(0, 10, 0, 160), function()
-    print("FPS: " .. math.floor(1 / game:GetService("RunService").RenderStepped:Wait())) -- Exibir FPS
-end)
-
-createButton("Resolução", UDim2.new(0, 10, 0, 210), function()
-    print("Resolução: " .. workspace.CurrentCamera.ViewportSize.X .. "x" .. workspace.CurrentCamera.ViewportSize.Y) -- Exibir resolução
-end)
-
--- Adicione outras funções conforme necessário
