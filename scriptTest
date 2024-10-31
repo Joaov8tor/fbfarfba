@@ -4,6 +4,9 @@ local Frame = Instance.new("Frame")
 local JumpLabel = Instance.new("TextLabel")
 local JumpBox = Instance.new("TextBox")
 local ApplyButton = Instance.new("TextButton")
+local FlyLabel = Instance.new("TextLabel")
+local FlyBox = Instance.new("TextBox")
+local FlyButton = Instance.new("TextButton")
 
 -- Configurando o ScreenGui
 ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
@@ -12,8 +15,8 @@ ScreenGui.Name = "ScriptHub"
 -- Configurando o Frame principal
 Frame.Parent = ScreenGui
 Frame.BackgroundColor3 = Color3.new(1, 1, 1)
-Frame.Size = UDim2.new(0, 300, 0, 200)
-Frame.Position = UDim2.new(0.5, -150, 0.5, -100)
+Frame.Size = UDim2.new(0, 300, 0, 250)
+Frame.Position = UDim2.new(0.5, -150, 0.5, -125)
 
 -- Configurando o rótulo do Power Jump
 JumpLabel.Parent = Frame
@@ -33,15 +36,80 @@ JumpBox.TextSize = 18
 
 -- Configurando o botão Aplicar
 ApplyButton.Parent = Frame
-ApplyButton.Text = "Aplicar"
+ApplyButton.Text = "Aplicar Jump"
 ApplyButton.Size = UDim2.new(0, 200, 0, 50)
-ApplyButton.Position = UDim2.new(0, 50, 0, 100)
+ApplyButton.Position = UDim2.new(0, 50, 0, 80)
 ApplyButton.BackgroundColor3 = Color3.new(0.2, 0.6, 0.8)
 ApplyButton.TextColor3 = Color3.new(1, 1, 1)
 ApplyButton.TextSize = 18
+
+-- Configurando o rótulo da velocidade de voo
+FlyLabel.Parent = Frame
+FlyLabel.Text = "Velocidade de Voo:"
+FlyLabel.Size = UDim2.new(0, 150, 0, 50)
+FlyLabel.Position = UDim2.new(0, 10, 0, 140)
+FlyLabel.TextColor3 = Color3.new(0, 0, 0)
+FlyLabel.TextSize = 18
+
+-- Configurando a caixa de entrada para a velocidade de voo
+FlyBox.Parent = Frame
+FlyBox.PlaceholderText = "50"  -- Valor padrão
+FlyBox.Size = UDim2.new(0, 100, 0, 50)
+FlyBox.Position = UDim2.new(0, 160, 0, 140)
+FlyBox.TextColor3 = Color3.new(0, 0, 0)
+FlyBox.TextSize = 18
+
+-- Configurando o botão de voar
+FlyButton.Parent = Frame
+FlyButton.Text = "Ativar Voo"
+FlyButton.Size = UDim2.new(0, 200, 0, 50)
+FlyButton.Position = UDim2.new(0, 50, 0, 200)
+FlyButton.BackgroundColor3 = Color3.new(0.2, 0.6, 0.8)
+FlyButton.TextColor3 = Color3.new(1, 1, 1)
+FlyButton.TextSize = 18
+
+-- Variáveis para controle de voo
+local flying = false
+local bodyVelocity
+
+-- Função para ativar o voo
+local function toggleFly()
+    flying = not flying
+    local character = game.Players.LocalPlayer.Character
+
+    if flying then
+        -- Cria um BodyVelocity para controlar o voo
+        bodyVelocity = Instance.new("BodyVelocity")
+        bodyVelocity.Velocity = Vector3.new(0, 0, 0)
+        bodyVelocity.MaxForce = Vector3.new(4000, 4000, 4000)
+        bodyVelocity.Parent = character.HumanoidRootPart
+
+        -- Atualiza a velocidade de voo
+        local flySpeed = tonumber(FlyBox.Text) or 50  -- Usa 50 se a entrada for inválida
+        local userInputService = game:GetService("UserInputService")
+
+        -- Movendo o personagem enquanto voa
+        userInputService.InputChanged:Connect(function(input)
+            if flying then
+                if input.UserInputType == Enum.UserInputType.MouseMovement then
+                    bodyVelocity.Velocity = Vector3.new(input.Position.X / 50, 50, input.Position.Y / 50) * flySpeed
+                end
+            end
+        end)
+
+    else
+        if bodyVelocity then
+            bodyVelocity:Destroy()  -- Remove a força de voo
+        end
+    end
+end
 
 -- Função para alterar o Power Jump
 ApplyButton.MouseButton1Click:Connect(function()
     local newJumpPower = tonumber(JumpBox.Text) or 50  -- Usa 50 se a entrada for inválida
     game.Players.LocalPlayer.Character.Humanoid.JumpPower = newJumpPower
 end)
+
+-- Conectando o botão de voar
+FlyButton.MouseButton1Click:Connect(toggleFly)
+
