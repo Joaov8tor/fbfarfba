@@ -1,0 +1,47 @@
+-- Criando o GUI do Script Hub
+local ScreenGui = Instance.new("ScreenGui")
+local Frame = Instance.new("Frame")
+local JumpLabel = Instance.new("TextLabel")
+local JumpBox = Instance.new("TextBox")
+local ApplyButton = Instance.new("TextButton")
+
+-- Configurando o ScreenGui
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.Name = "ScriptHub"
+
+-- Configurando o Frame principal
+Frame.Parent = ScreenGui
+Frame.BackgroundColor3 = Color3.new(1, 1, 1)
+Frame.Size = UDim2.new(0, 300, 0, 200)
+Frame.Position = UDim2.new(0.5, -150, 0.5, -100)
+
+-- Configurando o rótulo do Power Jump
+JumpLabel.Parent = Frame
+JumpLabel.Text = "Power Jump:"
+JumpLabel.Size = UDim2.new(0, 100, 0, 50)
+JumpLabel.Position = UDim2.new(0, 10, 0, 20)
+JumpLabel.TextColor3 = Color3.new(0, 0, 0)
+JumpLabel.TextSize = 18
+
+-- Configurando a caixa de entrada para o valor do Jump
+JumpBox.Parent = Frame
+JumpBox.PlaceholderText = "50"  -- Valor padrão
+JumpBox.Size = UDim2.new(0, 100, 0, 50)
+JumpBox.Position = UDim2.new(0, 120, 0, 20)
+JumpBox.TextColor3 = Color3.new(0, 0, 0)
+JumpBox.TextSize = 18
+
+-- Configurando o botão Aplicar
+ApplyButton.Parent = Frame
+ApplyButton.Text = "Aplicar"
+ApplyButton.Size = UDim2.new(0, 200, 0, 50)
+ApplyButton.Position = UDim2.new(0, 50, 0, 100)
+ApplyButton.BackgroundColor3 = Color3.new(0.2, 0.6, 0.8)
+ApplyButton.TextColor3 = Color3.new(1, 1, 1)
+ApplyButton.TextSize = 18
+
+-- Função para alterar o Power Jump
+ApplyButton.MouseButton1Click:Connect(function()
+    local newJumpPower = tonumber(JumpBox.Text) or 50  -- Usa 50 se a entrada for inválida
+    game.Players.LocalPlayer.Character.Humanoid.JumpPower = newJumpPower
+end)
