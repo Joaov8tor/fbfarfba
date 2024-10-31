@@ -74,8 +74,12 @@ local bodyVelocity
 
 -- Função para ativar o voo
 local function toggleFly()
-    flying = not flying
     local character = game.Players.LocalPlayer.Character
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+
+    if not humanoid then return end  -- Verifica se o personagem tem um Humanoid
+
+    flying = not flying
 
     if flying then
         -- Cria um BodyVelocity para controlar o voo
@@ -86,14 +90,27 @@ local function toggleFly()
 
         -- Atualiza a velocidade de voo
         local flySpeed = tonumber(FlyBox.Text) or 50  -- Usa 50 se a entrada for inválida
-        local userInputService = game:GetService("UserInputService")
 
-        -- Movendo o personagem enquanto voa
-        userInputService.InputChanged:Connect(function(input)
+        -- Move o personagem enquanto voa
+        game:GetService("UserInputService").InputChanged:Connect(function(input)
             if flying then
-                if input.UserInputType == Enum.UserInputType.MouseMovement then
-                    bodyVelocity.Velocity = Vector3.new(input.Position.X / 50, 50, input.Position.Y / 50) * flySpeed
+                bodyVelocity.Velocity = Vector3.new(0, flySpeed, 0) -- Permite o movimento vertical
+                local direction = Vector3.new()
+                
+                if input.UserInputType == Enum.UserInputType.Keyboard then
+                    if input.KeyCode == Enum.KeyCode.W then
+                        direction = direction + Vector3.new(0, 0, -1)
+                    elseif input.KeyCode == Enum.KeyCode.S then
+                        direction = direction + Vector3.new(0, 0, 1)
+                    elseif input.KeyCode == Enum.KeyCode.A then
+                        direction = direction + Vector3.new(-1, 0, 0)
+                    elseif input.KeyCode == Enum.KeyCode.D then
+                        direction = direction + Vector3.new(1, 0, 0)
+                    end
                 end
+
+                -- Aplica a direção do movimento
+                bodyVelocity.Velocity = bodyVelocity.Velocity + (direction * flySpeed)
             end
         end)
 
