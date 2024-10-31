@@ -6,7 +6,8 @@ local JumpBox = Instance.new("TextBox")
 local ApplyButton = Instance.new("TextButton")
 local EspButton = Instance.new("TextButton")
 local PanelToggleButton = Instance.new("TextButton") -- Botão para ocultar/exibir o painel
-local isVisible = true -- Variável para controlar a visibilidade do painel
+local OpenPanelButton = Instance.new("TextButton") -- Botão para abrir o painel
+local isVisible = false -- Inicialmente o painel está oculto
 
 -- Configurando o ScreenGui
 ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
@@ -18,6 +19,7 @@ Frame.BackgroundColor3 = Color3.new(1, 1, 1)
 Frame.Position = UDim2.new(0.5, -100, 0.5, -100)
 Frame.Size = UDim2.new(0, 200, 0, 200)
 Frame.BorderSizePixel = 0
+Frame.Visible = isVisible -- Define a visibilidade inicial do Frame
 
 -- Configurando o TextLabel para o Jump
 JumpLabel.Parent = Frame
@@ -53,6 +55,14 @@ PanelToggleButton.Size = UDim2.new(1, 0, 0, 30)
 PanelToggleButton.Position = UDim2.new(0, 0, 0, 150)
 PanelToggleButton.BackgroundColor3 = Color3.new(0.8, 0.2, 0.2)
 
+-- Configurando o TextButton para abrir o painel
+OpenPanelButton.Parent = Frame
+OpenPanelButton.Text = "Abrir Painel"
+OpenPanelButton.Size = UDim2.new(1, 0, 0, 30)
+OpenPanelButton.Position = UDim2.new(0, 0, 0, 180)
+OpenPanelButton.BackgroundColor3 = Color3.new(0.2, 0.2, 0.8)
+OpenPanelButton.Visible = false -- Inicialmente invisível
+
 -- Função para aplicar o Jump Height
 ApplyButton.MouseButton1Click:Connect(function()
     local jumpHeight = tonumber(JumpBox.Text)
@@ -67,7 +77,15 @@ end)
 EspButton.MouseButton1Click:Connect(function()
     for _, player in pairs(game.Players:GetPlayers()) do
         if player ~= game.Players.LocalPlayer then
+            -- Remove o ESP anterior se existir
+            local existingEsp = player.Character:FindFirstChild("ESP")
+            if existingEsp then
+                existingEsp:Destroy()
+            end
+            
+            -- Cria um novo ESP
             local esp = Instance.new("BillboardGui")
+            esp.Name = "ESP"
             esp.Size = UDim2.new(1, 0, 1, 0)
             esp.Adornee = player.Character:WaitForChild("Head")
             esp.AlwaysOnTop = true
@@ -84,10 +102,17 @@ EspButton.MouseButton1Click:Connect(function()
     end
 end)
 
--- Função para alternar a visibilidade do painel
+-- Função para ocultar/exibir o painel
 PanelToggleButton.MouseButton1Click:Connect(function()
     isVisible = not isVisible
     Frame.Visible = isVisible
+    OpenPanelButton.Visible = not isVisible -- Mostra o botão "Abrir Painel" se o painel estiver oculto
+end)
+
+-- Função para abrir o painel
+OpenPanelButton.MouseButton1Click:Connect(function()
+    Frame.Visible = true
+    OpenPanelButton.Visible = false
 end)
 
 -- Ajuste do painel inicial
